@@ -1,0 +1,24 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Document
+  body
+   table(border='3')
+    thead 
+     tr
+      th 存提
+      th 金額
+      th 餘額
+      th 時間
+    tbody
+    for history in histories
+     -const historyObj = JSON.parse(history)
+      tr
+       td=historyObj.move
+       td=historyObj.amount 
+       td=historyObj.balance
+       td=historyObj.date
+   button #[a(href='/bank') 返回上一頁]
