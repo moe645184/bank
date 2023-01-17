@@ -10,6 +10,10 @@ class service extends Service {
     return ''
   }
 
+  async del(key) {
+    await this.app.redis.del(key)
+  }
+
   async lpush(key,value) {
     value = JSON.stringify(value)
     await this.app.redis.lpush(key, value)
@@ -17,6 +21,22 @@ class service extends Service {
 
   async lindex(key,index){
     let data = await this.app.redis.lindex(key, index)
+    if (data) {
+      return JSON.parse(data)
+    }
+    return ''
+  }
+
+  async llen(key){
+    let data = await this.app.redis.llen(key)
+    if (data) {
+      return data
+    }
+    return ''
+  }
+
+  async rpop(key){
+    let data = await this.app.redis.rpop(key)
     if (data) {
       return JSON.parse(data)
     }
@@ -31,16 +51,16 @@ class service extends Service {
     return ''
   }
 
-  async incrby(key, amount){
-    let data = await this.app.redis.incrby(key, amount)
+  async incrbyfloat(key, amount){
+    let data = await this.app.redis.incrbyfloat(key, amount)
     if (data){
       return JSON.parse(data)
     }
     return ''
   }
 
-  async decrby(key, amount){
-    let data = await this.app.redis.decrby(key, amount)
+  async decrbyfloat(key, amount){
+    let data = await this.app.redis.incrbyfloat(key, -amount)
     if (data){
       return JSON.parse(data)
     }

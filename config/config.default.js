@@ -51,11 +51,16 @@ module.exports = appInfo => {
     dialect: 'mysql',
     database: 'bank',
     host: '127.0.0.1',
-    port: '3307',
-    username: 'test',
-    password: 'test123',
+    port: '3306',
+    username: 'root',
+    password: 'jeff645184',
     underscored: true,
     timezone: '+08:00',
+  };
+
+  config.schedule = {
+    type: 'all',
+    interval: '1s',
   };
 
   return {
