@@ -1,6 +1,7 @@
 /* eslint valid-jsdoc: "off" */
 
 'use strict';
+require('dotenv').config()
 
 /**
  * @param {Egg.EggAppInfo} appInfo app info
@@ -48,14 +49,19 @@ module.exports = appInfo => {
   };
 
   config.sequelize = {
-    dialect: 'mysql',
-    database: 'bank',
-    host: '127.0.0.1',
-    port: '3307',
-    username: 'test',
-    password: 'test123',
+    dialect: process.env.dialect,
+    database: process.env.database,
+    host: process.env.host,
+    port: process.env.port,
+    username: process.env.username,
+    password: process.env.password,
     underscored: true,
     timezone: '+08:00',
+  };
+
+  config.schedule = {
+    type: 'all',
+    interval: '1s',
   };
 
   return {

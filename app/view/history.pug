@@ -2,23 +2,68 @@ doctype html
 html(lang="en")
   head
     meta(charset="UTF-8")
-    meta(http-equiv="X-UA-Compatible", content="IE=edge")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    title Document
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title 交易紀錄
   body
-   table(border='3')
-    thead 
-     tr
-      th 存提
-      th 金額
-      th 餘額
-      th 時間
-    tbody
-    for history in histories
-     -const historyObj = JSON.parse(history)
-      tr
-       td=historyObj.move
-       td=historyObj.amount 
-       td=historyObj.balance
-       td=historyObj.date
-   button #[a(href='/bank') 返回上一頁]
+    button #[a(href="javascript:history.back()") 返回前頁]
+    table(border='3')
+      thead 
+        tr
+          th 存提
+          th 金額
+          th 餘額
+          th 時間
+      tbody
+      for history in histories
+        tr
+          td=history.move
+          td=history.amount 
+          td=history.balance
+          td=history.date
+    p 當前在第 #[span 1] 頁，共 #{pageCount} 頁
+      button(onclick='prev()') 上一頁 
+      button(onclick='next()') 下一頁
+
+  script.
+    const tbody = document.querySelectorAll('tbody')[1]
+    const span = document.querySelector('span')
+    let page = #{ page }
+    function prev(){
+      if(page == 1){
+        return alert('已在首頁')
+      }
+      page--
+      fetch('/datas?page=' + page)
+        .then(res => res.json())
+        .then(data => {
+          tbody.innerHTML = ''
+          TXNlist(data)
+        });
+    }
+
+    function next(){
+      if(page == #{ pageCount }){
+        return alert('已在末頁')
+      }
+      page++
+      fetch('/datas?page=' + page)
+        .then(res => res.json())
+        .then(data => {
+          tbody.innerHTML = ''
+          TXNlist(data)
+        });
+    }
+
+    function TXNlist(data){
+      span.innerHTML = `${ page }`
+      data.histories.forEach(history=>{ tbody.innerHTML +=`
+          <tr>
+            <td>${ history.move }</td>
+            <td>${ history.amount }</td>
+            <td>${ history.balance }</td>
+            <td>${ history.date }</td>
+          </tr>
+          `
+          })
+    }

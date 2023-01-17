@@ -9,6 +9,7 @@
       "version": "1.0.0",
       "license": "MIT",
       "dependencies": {
+        "dotenv": "^16.0.3",
         "egg": "^3",
         "egg-redis": "^2.4.0",
         "egg-scripts": "^2",
@@ -4587,6 +4588,14 @@
       },
       "engines": {
         "node": ">=4"
+      }
+    },
+    "node_modules/dotenv": {
+      "version": "16.0.3",
+      "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.0.3.tgz",
+      "integrity": "sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==",
+      "engines": {
+        "node": ">=12"
       }
     },
     "node_modules/dottie": {
@@ -18711,6 +18720,11 @@
       "requires": {
         "is-obj": "^1.0.0"
       }
+    },
+    "dotenv": {
+      "version": "16.0.3",
+      "resolved": "https://registry.npmjs.org/dotenv/-/dotenv-16.0.3.tgz",
+      "integrity": "sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ=="
     },
     "dottie": {
       "version": "2.0.2",
