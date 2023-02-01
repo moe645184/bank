@@ -1,0 +1,20 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title 註冊畫面
+  body
+    section 
+      h2 註冊帳號
+      form(action='/account' method='post')
+        label(for='nickname') 暱稱#[input(type='text' id='nickname' name='nickname' required)]
+        br
+        label(for='account') 帳號#[input(type='text' id='account' name='account' pattern='[a-zA-z0-9]{8,}' title='請輸入8個英數字以上帳號' required)]
+        br
+        label(for='password') 密碼#[input(type='password' id='password' name='password' pattern='(?=.*[a-zA-Z])(?=.*[0-9]).{8,}' title='請輸入8個字以上英數字混合密碼' required)]
+        br
+        input(type='submit' value='確定註冊')
+        button #[a(href='javascript:history.back()') 取消]
+      

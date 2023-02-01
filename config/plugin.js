@@ -18,4 +18,11 @@ module.exports = {
     enable: true,
     package: 'egg-sequelize'
 },
+  session : {
+    key: 'SESSION_ID',
+    maxAge: 50000,
+    httpOnly: true,
+    encrypt: true,
+    renew:true,
+},
 };
