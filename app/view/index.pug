@@ -2,18 +2,35 @@ doctype html
 html(lang="en")
   head
     meta(charset="UTF-8")
-    meta(http-equiv="X-UA-Compatible", content="IE=edge")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    title 大富翁銀行
-  body 
-   p 最近交易：#{lastTXN.move} 金額：#{lastTXN.amount}元 時間：#{lastTXN.date} 餘額：#{lastTXN.balance}
-   button #[a(href='/bank/history') 詳細內容]
-   p 目前金額為： #{balance} 元
-   button(onclick='deposit()') 存款
-   button(onclick='withdraw()') 提款
-   form(class='lightbox' action='/deposit' method='post' style='display:none')
-    h2 
-    input(type='number' name='amount' min='0')
-    input(type='submit' value='確定')
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title 銀行
+  body
+    a(href="/bank") 換帳號
+    p 你好#{account}
+    p 目前餘額： #{balance} 元
+    button #[a(href='/bank/history') 交易紀錄明細]
+    p 選擇存提款
+    button(onclick='deposit()') 存款
+    button(onclick='withdraw()') 提款
+    form(class='lightbox' action='/deposit' method='post' style='display:none')
+      h2
+      p 從#[input(type='text' name='account' value=account)]到#[input(type='text' name='to')]
+      input(type="text" name='amount' pattern='[0-9]+([\.][0-9]+)?' title='只能輸入大於0的數字')
+      input(type='submit' value='確定')
 
-    script(src="../public/js/index.js") 
+    script.
+      const form = document.querySelector('form')
+      const h2 = document.querySelector('h2')
+
+      function deposit(){
+        form.action = '/bank/deposit'
+        form.style.display = 'block'
+        h2.innerHTML = '存款'
+      }
+
+      function withdraw(){
+        form.action = '/bank/withdraw'
+        form.style.display = 'block'
+        h2.innerHTML = '提款'
+      }
