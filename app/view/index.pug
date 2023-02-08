@@ -6,31 +6,48 @@ html(lang="en")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     title 銀行
   body
-    a(href="/bank") 換帳號
-    p 你好#{account}
-    p 目前餘額： #{balance} 元
-    button #[a(href='/bank/history') 交易紀錄明細]
+    a(href = "/logout") 登出
+    p 你好，#{ nickname }
+    p 目前餘額： #{ balance } 元
+    button #[a(href=`/bank/history/${ account }`) 交易紀錄明細]
     p 選擇存提款
-    button(onclick='deposit()') 存款
-    button(onclick='withdraw()') 提款
+    button(onclick = 'deposit()') 存款
+    button(onclick = 'transfer()') 轉帳
+    button(onclick = 'withdraw()') 提款
     form(class='lightbox' action='/deposit' method='post' style='display:none')
       h2
-      p 從#[input(type='text' name='account' value=account)]到#[input(type='text' name='to')]
-      input(type="text" name='amount' pattern='[0-9]+([\.][0-9]+)?' title='只能輸入大於0的數字')
-      input(type='submit' value='確定')
+      p 操作帳號：#[input(type = 'text' name = 'account' readonly value = account style = 'border:none;')]
+      label(for = "target" id = 'transfer-account' style = 'display:none') 轉入帳號：#[input(type = 'text' id = 'target' name = 'target' disabled required)]
+      label(for = 'amount') 金額#[input(type = "text" id = 'amount' name = 'amount' pattern = '[0-9]+([\.][0-9]+)?' title = '只能輸入大於0的數字' required)]
+      br
+      input(type = 'submit' value = '確定')
 
     script.
       const form = document.querySelector('form')
       const h2 = document.querySelector('h2')
+      const transferAccount = document.querySelector('#transfer-account')
+      const target = document.querySelector('#target')
 
       function deposit(){
         form.action = '/bank/deposit'
         form.style.display = 'block'
-        h2.innerHTML = '存款'
+        transferAccount.style.display = 'none'
+        target.disabled = true;
+        h2.innerHTML='存款'
+      }
+
+      function transfer(){
+        form.action = '/bank/transfer'
+        form.style.display = 'block'
+        transferAccount.style.display = 'block'
+        target.disabled = false;
+        h2.innerHTML='轉帳'
       }
 
       function withdraw(){
         form.action = '/bank/withdraw'
         form.style.display = 'block'
+        transferAccount.style.display = 'none'
+        target.disabled = true;
         h2.innerHTML = '提款'
       }

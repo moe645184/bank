@@ -7,6 +7,7 @@ html(lang="en")
     title 交易紀錄
   body
     button #[a(href="javascript:history.back()") 返回前頁]
+    p 當前帳號：#{ account }
     table(border='3')
       thead 
         tr
@@ -28,13 +29,14 @@ html(lang="en")
   script.
     const tbody = document.querySelectorAll('tbody')[1]
     const span = document.querySelector('span')
+    const account = document.querySelector('p').textContent.slice(5)
     let page = #{ page }
     function prev(){
       if(page == 1){
         return alert('已在首頁')
       }
       page--
-      fetch('/datas?page=' + page)
+      fetch(`/datas/${ account }?page=` + page)
         .then(res => res.json())
         .then(data => {
           tbody.innerHTML = ''
@@ -47,7 +49,7 @@ html(lang="en")
         return alert('已在末頁')
       }
       page++
-      fetch('/datas?page=' + page)
+      fetch(`/datas/${ account }?page=` + page)
         .then(res => res.json())
         .then(data => {
           tbody.innerHTML = ''

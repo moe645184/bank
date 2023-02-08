@@ -4,17 +4,12 @@ const { Controller } = require('egg');
 
 class BankController extends Controller {
 
-  async login(){
-    const { ctx } = this;
-    await ctx.render('login.pug');
-  }
-
   async deposit() {
     const { ctx } = this;
-    const account = ctx.request.body.account; 
     const amount = ctx.request.body.amount;
-    if (isNaN(Number(account)) || Number(account) <= 0 ){
-      return ctx.body = `<script>alert("請輸入大於0的數字，請返回上頁");</script>`;
+    const account = ctx.request.body.account;
+    if (isNaN(Number(amount)) || Number(amount) <= 0 ){
+      return ctx.body = '請輸入大於0的數字，請返回上頁';
     }
     const balance = await ctx.service.bank.incrbyfloat(account + '_balance', amount);
     const date = new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' });
@@ -23,19 +18,52 @@ class BankController extends Controller {
     await ctx.service.bank.lpush('history', history);
     ctx.redirect(`/bank/users/${ account }`) 
   }
+  
+  async transfer() {
+    const { ctx } = this;
+    let account = ctx.request.body.account;
+    const amount = ctx.request.body.amount;
+    if (isNaN(Number(amount)) || Number(amount) <= 0 ){
+      return ctx.body = '請輸入大於0的數字，請返回上頁';
+    }
+    const target = ctx.request.body.target;
+    let move = `轉出至${ target }`;
+    const targetCheck = await ctx.model.Account.findOne({
+      where: { account: target }
+    });
+    if (!targetCheck){
+      return ctx.body = '欲轉入帳戶不存在'
+    }
+    let accountBalance = await ctx.service.bank.decrbyfloat(account + '_balance', amount);
+    if (accountBalance < 0) {
+      accountBalance = await ctx.service.bank.incrbyfloat(account + '_balance', amount);
+      return ctx.body = '提款金額大於餘額，請返回上頁';
+    }
+    const targetBalance = await ctx.service.bank.incrbyfloat(target + '_balance', amount);
+    const date = new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' });
+    let balance = accountBalance;
+    const accountHistory = { move, account, amount, balance, date };
+    move = `由${ account }轉入`;
+    balance = targetBalance;
+    account = target;
+    const targetHistory = { move, account, amount, balance, date };
+    await ctx.service.bank.lpush('history', accountHistory);
+    await ctx.service.bank.lpush('history', targetHistory);
+    ctx.redirect(ctx.get('referer') || '/bank');
+  }
 
   async withdraw() {
     const { ctx } = this;
     const account = ctx.request.body.account;
     const amount = ctx.request.body.amount;
-    if (isNaN(Number(account)) || Number(account) <= 0 ){
-      return ctx.body = `<script>alert("請輸入大於0的數字，請返回上頁");</script>`;
+    if (isNaN(Number(amount)) || Number(amount) <= 0 ){
+      return ctx.body = '請輸入大於0的數字，請返回上頁';
     }
-    const avalible = await ctx.service.bank.get(account + '_balance');
-    if (amount > avalible) {
-      ctx.body = `<script>alert("餘額小於提款金額，請返回上頁");</script>`;
+    let balance = await ctx.service.bank.decrbyfloat(account + '_balance', amount);
+    if (balance < 0) {
+      balance = await ctx.service.bank.incrbyfloat(account + '_balance', amount);
+      return ctx.body = '提款金額大於餘額，請返回上頁';
     } else {
-      const balance = await ctx.service.bank.decrbyfloat(account + '_balance', amount);
       const date = new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' });
       const move = '提款';
       const history = { move, account, amount, balance, date }; 
@@ -47,27 +75,35 @@ class BankController extends Controller {
   async index() {
     const { ctx } = this;
     const account = this.ctx.params.account;
+    const accountData = await ctx.model.Account.findOne({
+      where: { account: account }
+    });
+    const nickname = accountData.nickname
     let balance = await ctx.service.bank.get(account + '_balance');
     if (!balance){
       const bank = await ctx.model.Bank.findOne({
         where: { account: account },
         order: [['createdAt', 'DESC']],
       });
-      if(!bank){
+      if (!bank){
         await ctx.app.redis.set(account + '_balance', 0);
       } else {
         await ctx.app.redis.set(account + '_balance', bank.balance);
       }
       balance = await ctx.service.bank.get(account + '_balance');
     }
-    await ctx.render('index.pug', { account, balance });
+    await ctx.render('index.pug', { account, balance, nickname });
   }
 
   async getData() {
     const { ctx } = this;
+    const account = this.ctx.params.account
     const pageSize = 10;
     const page = ctx.query.page || 1;
     const histories = await ctx.model.Bank.findAll({
+      where: {
+        account: account
+      },
       limit: pageSize,
       offset: (page - 1) * pageSize,
       order: [['id', 'DESC']],
@@ -81,15 +117,23 @@ class BankController extends Controller {
   async historyPage() {
     const { ctx } = this;
     const pageSize = 10;
+    const account = this.ctx.params.account
     const page = ctx.query.page || 1
-    const dataCount = await ctx.model.Bank.count();
-    const pageCount = Math.ceil(dataCount / pageSize);
     const histories = await ctx.model.Bank.findAll({
+      where: {
+        account: account
+      },
       limit: pageSize,
       offset: (page - 1) * pageSize,
       order: [['id', 'DESC']],
     });
-    await ctx.render('history.pug', { histories, page, pageCount });
+    const dataCount = await ctx.model.Bank.count({
+      where: {
+        account: account
+      }
+    });
+    const pageCount = Math.ceil(dataCount / pageSize);
+    await ctx.render('history.pug', { histories, page, pageCount, account });
   }
 
 }

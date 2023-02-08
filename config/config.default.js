@@ -64,6 +64,14 @@ module.exports = appInfo => {
     interval: '1s',
   };
 
+  config.session = {
+    key: 'SESSION_ID',
+    maxAge: 60 * 60 * 1000,
+    httpOnly: true,
+    encrypt: true,
+    renew: true,
+  };
+
   return {
     ...config,
     ...userConfig,
