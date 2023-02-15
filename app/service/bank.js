@@ -2,11 +2,34 @@ const Service = require('egg').Service;
 
 class service extends Service {
 
+  async numberCheck(amount){
+    const numberRegex = /^[0-9]+([\.][0-9]{0,4})?$/;
+    if (!numberRegex.test(amount) || isNaN(Number(amount)) || Number(amount) <= 0 ){
+      return false
+    }
+
+    return true
+  }
+
   async get(key) {
     let data = await this.app.redis.get(key)
-    if (data) {
-      return JSON.parse(data)
+    if (data === null){
+      return data
     }
+    if (data){
+      return parse(data)
+    }
+
+    return ''
+  }
+
+  async getBalance(key) {
+    let data = await this.app.redis.get(key)
+    let balance = data / 10000
+    if (balance || balance === 0) {
+      return JSON.parse(balance)
+    }
+
     return ''
   }
 
@@ -24,6 +47,7 @@ class service extends Service {
     if (data) {
       return JSON.parse(data)
     }
+
     return ''
   }
 
@@ -32,6 +56,7 @@ class service extends Service {
     if (data) {
       return data
     }
+
     return ''
   }
 
@@ -40,6 +65,7 @@ class service extends Service {
     if (data) {
       return JSON.parse(data)
     }
+
     return ''
   }
 
@@ -48,20 +74,19 @@ class service extends Service {
     if (data) {
       return data
     }
+    
     return ''
   }
 
-  async incrbyfloat(key, amount){
-    let data = await this.app.redis.incrbyfloat(key, amount)
-    if (data){
-      return JSON.parse(data)
+  async incrby(key, amount){
+    let data = await this.app.redis.incrby(key, amount * 10000)
+    return data
+  }
+
+  async decrby(key, amount){
+    let data = await this.app.redis.decrby(key, amount * 10000)
+    return data
     }
-    return ''
-  }
-
-  async decrbyfloat(key, amount){
-    return this.incrbyfloat(key, -amount)
-  }
 }
 
 module.exports = service;

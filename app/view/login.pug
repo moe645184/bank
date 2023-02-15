@@ -6,7 +6,12 @@ html(lang="en")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     title 登入畫面
   body
-    a(href="/bank/users/test9527") 登入一號
-    br
-    br
-    a(href="/bank/users/test3000") 登入二號
+    section
+      form(action='/check' method='post')
+        h2 登入帳號
+        label(for='account') 帳號#[input(type='text' id='account' name='account' required)]
+        br
+        label(for='password') 密碼#[input(type='password' id='password' name='password' required)]
+        br
+        input(type='submit' value='登入')
+        button #[a(href='/register') 註冊]

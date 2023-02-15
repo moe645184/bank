@@ -2,10 +2,12 @@
 // Do not modify this file!!!!!!!!!
 
 import 'egg';
+import ExportAccount = require('../../../app/model/account');
 import ExportBank = require('../../../app/model/bank');
 
 declare module 'egg' {
   interface IModel {
+    Account: ReturnType<typeof ExportAccount>;
     Bank: ReturnType<typeof ExportBank>;
   }
 }
